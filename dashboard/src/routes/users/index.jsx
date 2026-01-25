@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search } from "lucide-react";
 import UsersTable from "./table";
-import Pagination from "../../components/pagination";
+import Pagination from "../../components/Pagination";
 import { useFetchUsersQuery } from "../../store/features/users/usersApiSlice";
 import { TableSkeleton } from "../../components/Skeletons";
 import EmptyState from "../../components/EmptyState";
