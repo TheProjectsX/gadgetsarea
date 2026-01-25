@@ -6,12 +6,13 @@ import CartServices from "./cart.services";
 import { UserJwtPayload } from "../../middlewares/cookieAuth";
 
 const createCart = catchAsync(async (req: Request, res: Response) => {
-    await CartServices.createCart(req.body, req.user as UserJwtPayload);
+    const result = await CartServices.createCart(req.body, req.user as UserJwtPayload);
 
     sendResponse(res, {
         statusCode: StatusCodes.CREATED,
         success: true,
         message: "Product Added to Cart Successfully",
+        data: result.data
     });
 });
 

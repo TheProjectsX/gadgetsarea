@@ -24,7 +24,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
     const { id } = await params;
 
-    const product = (await getProduct(id)).data
+    const product = (await getProduct(id)).data;
 
     return {
         title: product.name,
@@ -51,6 +51,7 @@ const ProductDetails = async ({
     const product = response.data;
 
     const discount = product.purchasePrice - product.price;
+    
     return (
         <div className="">
             <div className="max-w-7xl mx-auto py-8">
@@ -186,7 +187,7 @@ const ProductDetails = async ({
                                     dangerouslySetInnerHTML={{
                                         __html: product.description.content,
                                     }}
-                                    className="text-gray-600"
+                                    className="text-gray-600 max-sm:[&_h3]:text-xl [&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:font-inter [&_h3]:mb-3"
                                 ></div>
                             </div>
                         )}

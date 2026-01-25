@@ -37,7 +37,11 @@ const createCart = async (payload: CreateCartInput, user: UserJwtPayload) => {
         },
     });
 
-    return result;
+    return {
+        data: {
+            id: result.id,
+        },
+    };
 };
 
 const getAllCarts = async (user: UserJwtPayload) => {

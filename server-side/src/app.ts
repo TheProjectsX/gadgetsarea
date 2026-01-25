@@ -10,7 +10,7 @@ import { stripeWebhook } from "./app/modules/Stripe/stripe.controllers";
 const app: Application = express();
 
 export const corsOptions = {
-    origin: ["http://localhost:3000", "http://localhost:5173"],
+    origin: ["http://localhost:3000", "http://localhost:5173", "https://gadgetsarea.vercel.app", "https://gadgetsarea-dashboard.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,

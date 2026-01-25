@@ -4,8 +4,14 @@ import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import ReactHead from "@theprojectsx/react-head";
+import { useRegisterMutation } from "@/store/features/auth/authApiSlice";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const Register = () => {
+    const [register] = useRegisterMutation();
+    const router = useRouter();
+
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [formData, setFormData] = useState({
@@ -16,13 +22,24 @@ const Register = () => {
         confirmPassword: "",
     });
 
-    const handleSubmit = () => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+
         if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match!");
+            toast.error("Passwords do not match!");
             return;
         }
-        console.log("Register:", formData);
-        // Handle registration logic here
+
+        try {
+            await register({ body: formData }).unwrap();
+            toast.success("Registration SuccessFul!");
+            router.push("/login");
+        } catch (error: any) {
+            console.error(error);
+            toast.error(
+                error?.data?.message ?? error?.message ?? "Login Failed!",
+            );
+        }
     };
 
     const handleGoogleSignUp = () => {
@@ -66,6 +83,7 @@ const Register = () => {
                         <button
                             onClick={handleGoogleSignUp}
                             className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:border-gray-400 hover:bg-gray-50 transition mb-6"
+                            disabled
                         >
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
                                 <path
@@ -101,7 +119,7 @@ const Register = () => {
                         </div>
 
                         {/* Registration Fields */}
-                        <div className="space-y-4">
+                        <form onSubmit={handleSubmit} className="space-y-4">
                             {/* Name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -272,12 +290,12 @@ const Register = () => {
 
                             {/* Submit Button */}
                             <button
-                                onClick={handleSubmit}
+                                type="submit"
                                 className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
                             >
                                 Create Account
                             </button>
-                        </div>
+                        </form>
 
                         {/* Sign In Link */}
                         <p className="text-center text-gray-600 mt-6">

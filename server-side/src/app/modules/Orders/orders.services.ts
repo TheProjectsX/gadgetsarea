@@ -68,7 +68,7 @@ const createOrder = async (
             });
         }
 
-        const res = await transactionClient.cart.deleteMany({
+        await transactionClient.cart.deleteMany({
             where: {
                 id: {
                     in: payload.cartIds,
@@ -76,7 +76,6 @@ const createOrder = async (
                 customerId: user.customerId,
             },
         });
-        console.log(res);
 
         return order;
     });

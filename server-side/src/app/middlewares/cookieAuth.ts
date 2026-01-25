@@ -16,8 +16,8 @@ export type UserJwtPayload = {
 
 export const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    secure: true,
+    sameSite: "none",
 } satisfies CookieOptions;
 
 const auth = (...roles: UserRole[]) => {

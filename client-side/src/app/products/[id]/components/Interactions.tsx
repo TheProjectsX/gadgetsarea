@@ -1,5 +1,7 @@
 "use client";
 
+import { useAddToCartMutation } from "@/store/features/carts/cartsApiSlice";
+import { useCreateOrdersMutation } from "@/store/features/orders/ordersApiSlice";
 import {
     Heart,
     Minus,
@@ -9,6 +11,7 @@ import {
     ShoppingCart,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const Interactions = ({ product }: { product: any }) => {
     const [quantity, setQuantity] = useState(1);
@@ -21,6 +24,48 @@ const Interactions = ({ product }: { product: any }) => {
             ...prev,
             [variationName]: value,
         }));
+    };
+
+    const [createOrder] = useCreateOrdersMutation();
+    const [addToCart] = useAddToCartMutation();
+
+    const handleAddToCart = async () => {
+        try {
+            await addToCart({ body: { productId: product.id } }).unwrap();
+            toast.success("Added to Cart");
+        } catch (error: any) {
+            console.error(error);
+            toast.error(
+                error?.data?.message ??
+                    error?.message ??
+                    "Failed to Add to cart",
+            );
+        }
+    };
+
+    const checkoutPage = async () => {
+        try {
+            const response = await addToCart({ body: { productId: product.id } }).unwrap();
+
+            const data = await createOrder({
+                body: { cartIds: [response?.data?.id] },
+            }).unwrap();
+            if (data?.data?.url) {
+                const url = data.data.url;
+
+                window.location.href = url;
+                toast.success("Order created!");
+            } else {
+                toast.error("Failed to Create order");
+            }
+        } catch (error: any) {
+            console.error(error);
+            toast.error(
+                error?.data?.message ??
+                    error?.message ??
+                    "Failed to Create order",
+            );
+        }
     };
 
     return (
@@ -99,11 +144,11 @@ const Interactions = ({ product }: { product: any }) => {
 
             {/* Action Buttons */}
             <div className="flex items-center gap-3 mb-6">
-                <button className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2.5 cursor-pointer max-sm:text-sm">
+                <button onClick={handleAddToCart} className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2.5 cursor-pointer max-sm:text-sm">
                     <ShoppingCart className="size-4 sm:size-5" />
                     Add to Cart
                 </button>
-                <button className="flex-1 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition flex items-center justify-center gap-2.5 cursor-pointer max-sm:text-sm">
+                <button onClick={checkoutPage} className="flex-1 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition flex items-center justify-center gap-2.5 cursor-pointer max-sm:text-sm">
                     <ShoppingBag className="size-4 sm:size-5" />
                     Buy Now
                 </button>
