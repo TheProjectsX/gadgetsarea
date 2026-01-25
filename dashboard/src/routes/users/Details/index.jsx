@@ -12,7 +12,7 @@ import { useLoaderData, useNavigate } from "react-router-dom";
 import { DataCard } from "./components";
 import OrdersTable from "./table";
 import { useEffect, useState } from "react";
-import Pagination from "../../../components/pagination";
+import Pagination from "../../../components/Pagination";
 import { toast } from "react-toastify";
 import { useFetchUserOrdersQuery } from "../../../store/features/users/usersApiSlice";
 import { TableSkeleton } from "../../../components/Skeletons";

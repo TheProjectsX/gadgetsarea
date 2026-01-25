@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import OrdersTable from "./table";
-import Pagination from "../../components/pagination";
+import Pagination from "../../components/Pagination";
 import { TableSkeleton } from "../../components/Skeletons";
 import { useFetchOrdersQuery } from "../../store/features/orders/ordersApiSlice";
+import EmptyState from "../../components/EmptyState";
 
 const OrdersList = () => {
     const [params, setParams] = useState({

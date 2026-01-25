@@ -21,13 +21,31 @@ const tabs = [
     { id: "description", label: "Description" },
 ];
 
-const isSameArray = (a, b) =>
-    a.length === b.length &&
-    [...a].sort().every((v, i) => v === [...b].sort()[i]);
+const isSameArray = (a, b) => {
+    if ((!a || a.length === 0) && (!b || b.length === 0)) return true;
+    if (!a || !b) return false;
+    if (a.length !== b.length) return false;
 
-const isSameObject = (a, b) =>
-    Object.keys(a).length === Object.keys(b).length &&
-    Object.keys(a).every((key) => key in b && a[key] === b[key]);
+    const sa = [...a].sort();
+    const sb = [...b].sort();
+    return sa.every((v, i) => v === sb[i]);
+};
+
+const isSameObject = (a, b) => {
+    if (
+        (!a || Object.keys(a).length === 0) &&
+        (!b || Object.keys(b).length === 0)
+    )
+        return true;
+    if (!a || !b) return false;
+
+    const ka = Object.keys(a);
+    const kb = Object.keys(b);
+    return (
+        ka.length === kb.length &&
+        ka.every((key) => key in b && a[key] === b[key])
+    );
+};
 
 const genFormData = (basic) => {
     const { images = [], ...rest } = basic;
@@ -115,11 +133,11 @@ export default function EditProductPage() {
         setMessage({ text: "Basic Data inserted", type: "success" });
 
         await insertVariations({
-            body: { ...(variations ?? []), productId },
+            body: { data: variations, productId },
         }).unwrap();
         setMessage({ text: "Variations inserted", type: "success" });
 
-        await insertSpecs({ body: { ...specs, productId } }).unwrap();
+        await insertSpecs({ body: { data: specs, productId } }).unwrap();
         setMessage({ text: "Specs inserted", type: "success" });
 
         await insertDescription({
@@ -161,11 +179,17 @@ export default function EditProductPage() {
         }
 
         if (!isSameObject(description, product.description)) {
+            console.log(
+                description,
+                product.description,
+                isSameArray(description, product.description),
+            );
+
             await insertDescription({
                 body: {
                     productId: product.id,
                     banner: description.banner ?? undefined,
-                    description: description.description ?? undefined,
+                    content: description.content ?? undefined,
                     video: description.video ?? undefined,
                 },
             }).unwrap();
@@ -191,7 +215,11 @@ export default function EditProductPage() {
             }, 1000);
         } catch (error) {
             console.error(error);
-            toast.error(error?.data?.message ?? error?.message ?? "Failed to Create Product!");
+            toast.error(
+                error?.data?.message ??
+                    error?.message ??
+                    "Failed to Create Product!",
+            );
             setMessage(null);
         }
     };

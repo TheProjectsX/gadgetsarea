@@ -135,7 +135,7 @@ export const CategoryItem = ({ category, refetch }) => {
         try {
             await toggleStatus({
                 id: categoryId,
-            });
+            }).unwrap()
             setCatData((prev) => ({ ...prev, active: !prev.active }));
         } catch (error) {
             console.error(error);
@@ -148,7 +148,7 @@ export const CategoryItem = ({ category, refetch }) => {
             await updateCategory({
                 id: catData.id,
                 body: { ...category, id: undefined },
-            });
+            }).unwrap()
             setCatData(category);
             toast.success("Category Updated!");
             setShowEditModal(false);
@@ -160,7 +160,7 @@ export const CategoryItem = ({ category, refetch }) => {
 
     const handleDelete = async (categoryId) => {
         try {
-            await deleteCategory({ id: categoryId });
+            await deleteCategory({ id: categoryId }).unwrap()
             toast.success("Category deleted");
             refetch?.();
         } catch (error) {

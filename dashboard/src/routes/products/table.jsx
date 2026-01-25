@@ -91,7 +91,7 @@ const ProductsTable = ({ products, refetch }) => {
             );
         }
         try {
-            await deleteProduct({ id: productId });
+            await deleteProduct({ id: productId }).unwrap()
             refetch?.();
             toast.success("Product deleted successfully!");
         } catch (error) {
@@ -144,7 +144,7 @@ const ProductsTable = ({ products, refetch }) => {
             await updateProduct({
                 id: productId,
                 body: { tags: selectedTags },
-            });
+            }).unwrap()
             toast.success("Product tags updated");
             setShowEditTagsModal(false);
         } catch (error) {

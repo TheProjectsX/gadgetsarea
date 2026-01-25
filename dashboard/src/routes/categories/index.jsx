@@ -25,12 +25,17 @@ export default function CategoriesPage() {
 
     const handleAddCategory = async (category) => {
         try {
-            await createCategory({ body: category });
+            await createCategory({ body: category }).unwrap()
             toast.success("New category created!");
+            refetch()
             setShowAddModal(false);
         } catch (error) {
             console.error(error);
-            toast.error(error?.data?.message ?? error?.message ?? "Failed to create category");
+            toast.error(
+                error?.data?.message ??
+                    error?.message ??
+                    "Failed to create category",
+            );
         }
     };
 
@@ -47,7 +52,7 @@ export default function CategoriesPage() {
                         </p>
                     </div>
                     <button
-                        onClick={handleAddCategory}
+                        onClick={() => setShowAddModal(true)}
                         className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                     >
                         <Plus size={20} />
@@ -70,7 +75,8 @@ export default function CategoriesPage() {
                             Active Categories
                         </p>
                         <p className="text-2xl font-bold text-green-600 mt-1">
-                            {response?.data?.filter((cat) => cat.active)?.length ?? "--"}
+                            {response?.data?.filter((cat) => cat.active)
+                                ?.length ?? "--"}
                         </p>
                     </div>
                 </div>
@@ -109,7 +115,7 @@ export default function CategoriesPage() {
                                 Get started by creating your first category
                             </p>
                             <button
-                                onClick={handleAddCategory}
+                                onClick={()=>setShowAddModal(true)}
                                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                             >
                                 Add Category

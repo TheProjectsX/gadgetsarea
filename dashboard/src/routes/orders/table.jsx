@@ -47,7 +47,7 @@ const OrdersTable = ({ orders, refetch }) => {
         }
 
         try {
-            await deleteOrder({ id: productId });
+            await deleteOrder({ id: productId }).unwrap()
             refetch?.();
             toast.success("Order deleted successfully!");
         } catch (error) {

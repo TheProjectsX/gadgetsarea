@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Loader, Search } from "lucide-react";
 import ProductsTable from "./table";
-import Pagination from "../../components/pagination";
+import Pagination from "../../components/Pagination";
 import { Link } from "react-router-dom";
 import { useFetchProductsQuery } from "../../store/features/products/productsApiSlice";
 import { TableSkeleton } from "../../components/Skeletons";

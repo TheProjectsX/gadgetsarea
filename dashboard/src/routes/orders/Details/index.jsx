@@ -87,7 +87,7 @@ export default function OrderDetailsPage() {
         }
 
         try {
-            await deleteOrder({ id: productId });
+            await deleteOrder({ id: productId }).unwrap()
             toast.success("Order deleted successfully!");
             navigate("/orders", { replace: true });
         } catch (error) {
