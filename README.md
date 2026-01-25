@@ -85,7 +85,7 @@ Key features:
 1. Clone the repo:
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/TheProjectsX/gadgetsarea.git
 ```
 
 2. Install dependencies for backend, client, and dashboard:
