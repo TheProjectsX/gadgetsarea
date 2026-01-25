@@ -37,6 +37,7 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
 
 const updateAvatar = catchAsync(async (req: Request, res: Response) => {
     const file = req.file as unknown as string | null;
+
     if (!file) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Avatar is required!");
     }

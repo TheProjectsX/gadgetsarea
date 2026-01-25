@@ -5,7 +5,7 @@ export const parseBodyData = async (
     res: Response,
     next: NextFunction,
 ) => {
-    if (req.body.data) {
+    if (req.body?.data) {
         try {
             req.body = JSON.parse(req.body.data);
         } catch (error) {

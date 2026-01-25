@@ -2,6 +2,7 @@ import { Router } from "express";
 import UsersControllers from "./me.controllers";
 import { upload } from "../../../helpers/file/upload";
 import { uploadToImgbb } from "../../../helpers/image/uploadToImgbb";
+import { parseBodyData } from "../../middlewares/parseBodyData";
 
 const router = Router();
 

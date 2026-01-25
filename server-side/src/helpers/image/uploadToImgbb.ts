@@ -11,7 +11,6 @@ export const uploadToImgbb = async (
         const files = (
             req.file ? [req.file] : req.files
         ) as Express.Multer.File[];
-        console.log(files);
 
         if (!files) return next();
 
@@ -40,9 +39,6 @@ export const uploadToImgbb = async (
         } else {
             req.files = formatted;
         }
-
-        // Delete Files - Async
-        files.forEach((file) => deleteFile(file.filename));
 
         next();
     } catch (err) {

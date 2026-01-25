@@ -23,10 +23,14 @@ import { useFetchOrdersQuery } from "@/store/features/orders/ordersApiSlice";
 import { TableSkeleton } from "@/components/Skeletons";
 import EmptyState from "@/components/EmptyState";
 import ReactHead from "@theprojectsx/react-head";
+import { useUploadUserAvatarMutation } from "@/store/features/user/userApiSlice";
+import { toast } from "react-toastify";
 
 const UserDetailsPage = () => {
     const { data } = useSelector((state: any) => state.user_info);
     const user = data?.data;
+
+    const [uploadAvatar] = useUploadUserAvatarMutation();
 
     const [currentAvatar, setCurrentAvatar] = useState<{
         url: string;
@@ -44,7 +48,27 @@ const UserDetailsPage = () => {
     });
     const orders = response?.data;
 
-    const handleUploadAvatar = () => {};
+    const handleUploadAvatar = async () => {
+        try {
+            if (!currentAvatar.file) {
+                toast.error("Upload a File first!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("avatar", currentAvatar.file);
+
+            await uploadAvatar({ body: formData }).unwrap();
+            toast.success("Avatar Uploaded");
+        } catch (error: any) {
+            console.error(error);
+            toast.error(
+                error?.data?.message ??
+                    error?.message ??
+                    "Failed to Upload Avatar",
+            );
+        }
+    };
 
     return (
         <>
@@ -66,7 +90,7 @@ const UserDetailsPage = () => {
                                     />
 
                                     {/* Overlay */}
-                                    <label className="rounded-full absolute inset-0 bg-black/20 flex items-center justify-center cursor-pointer">
+                                    <label className="rounded-full absolute inset-0 bg-black/20 items-center justify-center cursor-pointer hidden group-hover:flex">
                                         <PenTool
                                             size={20}
                                             className="text-white"
@@ -227,7 +251,7 @@ const UserDetailsPage = () => {
 
                         {/* Empty State */}
                         {orders && orders.length === 0 && (
-                            <EmptyState title="No User to Show" />
+                            <EmptyState title="No Order to Show" />
                         )}
                     </div>
 

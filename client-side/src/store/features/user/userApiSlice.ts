@@ -6,13 +6,23 @@ const userApiSlice = baseApiSlice.injectEndpoints({
         updateUserInfo: builder.mutation({
             query: (data) => ({
                 url: "/me",
-                method: "PUT",
+                method: "PATCH",
+                body: data.body,
+            }),
+        }),
+        uploadUserAvatar: builder.mutation({
+            query: (data) => ({
+                url: "/me/avatar",
+                method: "PATCH",
                 body: data.body,
             }),
         }),
     }),
 });
 
-export const { useFetchUserInfoQuery, useUpdateUserInfoMutation } =
-    userApiSlice;
+export const {
+    useFetchUserInfoQuery,
+    useUpdateUserInfoMutation,
+    useUploadUserAvatarMutation,
+} = userApiSlice;
 export default userApiSlice;
