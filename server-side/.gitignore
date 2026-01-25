@@ -1,0 +1,12 @@
+node_modules
+dist
+.vercel
+.qodo
+.env
+uploads
+
+/prisma/prisma
+
+/generated/prisma
+
+/prisma/dbml

@@ -1,0 +1,295 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+generator dbml {
+    provider = "prisma-dbml-generator"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    email    String             @unique
+    password String?
+    method   RegistrationMethod @default(MANUAL)
+
+    role   UserRole       @default(CUSTOMER)
+    status ActivityStatus @default(ACTIVE)
+
+    verified Boolean @default(false)
+    deleted  Boolean @default(false)
+
+    customer Customer?
+    profile  Profile?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("users")
+}
+
+model Profile {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    userId String @unique @db.ObjectId
+    user   User   @relation(fields: [userId], references: [id])
+
+    avatar      String?
+    name        String?
+    phone       String?
+    description String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("profiles")
+}
+
+model Customer {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    userId String @unique @db.ObjectId
+    user   User   @relation(fields: [userId], references: [id])
+
+    carts    Cart[]
+    orders   Order[]
+    payments Payment[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("customers")
+}
+
+// model Category {
+//     id String @id @default(auto()) @map("_id") @db.ObjectId
+
+//     name        String
+//     description String?
+//     active      Boolean @default(true)
+
+//     parentId String?   @db.ObjectId
+//     parent   Category? @relation("CategoryTree", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+//     children Category[] @relation("CategoryTree")
+
+//     products Product[]
+
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+
+//     @@unique([name, parentId])
+//     @@map("categories")
+// }
+
+// For now, let's go with One Base category
+model Category {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    name        String    @unique
+    description String?
+    active      Boolean   @default(true)
+    products    Product[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("categories")
+}
+
+model Product {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    name          String
+    price         Int
+    purchasePrice Int
+    status        ProductStatus       @default(DRAFT)
+    availability  ProductAvailability @default(IN_STOCK)
+
+    brand  String?
+    images String[]
+    stock  Int      @default(0)
+
+    tags ProductTag[] @default([])
+
+    carts       Cart[]
+    variations  Variation[]
+    specs       Specs?
+    description Description?
+    orderItems  OrderItem[]
+
+    categoryId String?   @db.ObjectId
+    category   Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("products")
+}
+
+model Variation {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    productId String  @unique @db.ObjectId
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+    name   String
+    values String[]
+
+    @@map("product_variations")
+}
+
+model Specs {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    productId String  @unique @db.ObjectId
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+    data Json[] @default([]) // { name, value }[]
+
+    @@map("product_specifications")
+}
+
+model Description {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    productId String  @unique @db.ObjectId
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+    banner  String?
+    content String // We will be using ArticWriter -- nah, there is no time. Let's use regular WYSIWYG editor for now
+    video   String?
+
+    @@map("product_descriptions")
+}
+
+// Cart
+model Cart {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    customerId String   @db.ObjectId
+    customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+    productId String  @db.ObjectId
+    product   Product @relation(fields: [productId], references: [id])
+
+    quantity Int @default(1)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("carts")
+}
+
+// Order and Payments
+model Order {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    customerId String?   @db.ObjectId
+    customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+    totalAmount Int
+    status      OrderStatus @default(PENDING)
+
+    orderItems OrderItem[]
+    payment    Payment?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("orders")
+}
+
+model OrderItem {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    orderId String @db.ObjectId
+    order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+    productId String  @db.ObjectId
+    product   Product @relation(fields: [productId], references: [id])
+
+    quantity Int
+    price    Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("order_items")
+}
+
+model Payment {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    customerId String?   @db.ObjectId
+    customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+    orderId String @unique @db.ObjectId
+    order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+    amount        Int
+    status        PaymentStatus @default(PENDING)
+    transactionId String        @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("payments")
+}
+
+// ---------------- ENUM ----------------
+
+enum UserRole {
+    ADMIN
+    CUSTOMER
+}
+
+enum RegistrationMethod {
+    MANUAL
+    GOOGLE
+}
+
+enum ActivityStatus {
+    ACTIVE
+    INACTIVE
+    SUSPENDED
+}
+
+enum ProductTag {
+    NONE
+    FEATURED
+    NEW_ARRIVAL
+    BEST_DEAL
+}
+
+enum ProductStatus {
+    ACTIVE
+    INACTIVE
+    DRAFT
+}
+
+enum ProductAvailability {
+    IN_STOCK
+    OUT_OF_STOCK
+    PRE_ORDER
+    TBA
+}
+
+enum OrderStatus {
+    PENDING
+    PROCESSING
+    SHIPPED
+    DELIVERED
+    CANCELLED
+}
+
+enum PaymentStatus {
+    PENDING
+    COMPLETED
+    FAILED
+}
